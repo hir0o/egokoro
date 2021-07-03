@@ -1,14 +1,12 @@
-import { FC, FormEvent, useState } from 'react'
-import { Socket } from 'socket.io-client'
+import { Dispatch, FC, FormEvent, SetStateAction, useState } from 'react'
 import { ENDPOINT } from '../App'
 import axios from 'axios'
 
 type PropsType = {
-  setName: React.Dispatch<React.SetStateAction<string>>
-  socket: Socket
+  setName: Dispatch<SetStateAction<string>>
 }
 
-const SignIn: FC<PropsType> = ({ setName, socket }) => {
+const SignIn: FC<PropsType> = ({ setName }) => {
   const [inputName, setInputName] = useState('')
   const [isEnter, setIsEnter] = useState(true)
 
