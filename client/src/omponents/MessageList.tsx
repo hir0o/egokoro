@@ -26,7 +26,7 @@ const messages = [
 
 const MessageList: FC = () => {
   return (
-    <ul>
+    <ul className="border border-gray-400">
       {messages.map(({ name, text }) => (
         <MessageItem name={name} text={text} />
       ))}
