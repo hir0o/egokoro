@@ -56,9 +56,9 @@ io.on('connection', (socket) => {
     broadCast('end', payload)
   })
 
-  // test
-  socket.on('test', (payload) => {
-    console.log(payload)
+  // チャット送信のイベント
+  socket.on('chat', (payload) => {
+    broadCast('chat', payload)
   })
 
   socket.on('disconnect', () => {

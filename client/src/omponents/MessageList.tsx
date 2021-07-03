@@ -1,30 +1,12 @@
 import { FC } from 'react'
 import MessageItem from './MessageItem'
+import { MessageType } from '../types'
 
-const messages = [
-  {
-    name: 'ユーザー1',
-    text: 'わああ'
-  },
-  {
-    name: 'ユーザー2',
-    text: 'やああ'
-  },
-  {
-    name: 'announce',
-    text: 'ゲームを開始します．'
-  },
-  {
-    name: 'ユーザー3',
-    text: 'ぐああ'
-  },
-  {
-    name: 'announce',
-    text: '正解です！'
-  }
-]
+type PropsType = {
+  messages: MessageType[]
+}
 
-const MessageList: FC = () => {
+const MessageList: FC<PropsType> = ({ messages }) => {
   return (
     <ul className="border border-gray-400">
       {messages.map(({ name, text }) => (
