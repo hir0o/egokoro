@@ -9,10 +9,10 @@ type PropsType = {
 
 const Home: FC<PropsType> = ({ name }) => {
   return (
-    <>
+    <div>
       <h1>Hello{name}</h1>
       <MessageList />
-    </>
+    </div>
   )
 }
 
