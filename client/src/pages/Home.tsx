@@ -1,5 +1,6 @@
 import { FC } from 'react'
 import { Socket } from 'socket.io-client'
+import MessageList from '../omponents/MessageList'
 
 type PropsType = {
   name: string
@@ -7,7 +8,12 @@ type PropsType = {
 }
 
 const Home: FC<PropsType> = ({ name }) => {
-  return <h1>Hello{name}</h1>
+  return (
+    <>
+      <h1>Hello{name}</h1>
+      <MessageList />
+    </>
+  )
 }
 
 export default Home
