@@ -1,8 +1,9 @@
 const express = require('express')
 const app = express()
+const bodyParser = require('body-parser')
 const http = require('http')
 const server = http.createServer(app)
-// const { Server } = require('socket.io')
+
 const io = require('socket.io')(server, {
   cors: {
     origin: '*',
@@ -24,11 +25,18 @@ app.use((req, res, next) => {
   next()
 })
 
+app.use(bodyParser.json())
+
+const users = {}
+let socketId
+const MAX_NUMBER_OF_PEOPLE = 5
+
 app.get('/', (req, res) => {
   res.json({ message: 'ok' })
 })
 
 io.on('connection', (socket) => {
+  socketId = socket.id
   // 自分以外に送信する関数
   const broadCast = (eventName, payload) =>
     socket.broadcast.emit(eventName, payload)
@@ -54,11 +62,21 @@ io.on('connection', (socket) => {
   })
 
   socket.on('disconnect', () => {
-    // sendChat({
-    //   type: 'announce',
-    //   message: 'ユーザーが退室しました'
-    // })
+    console.log(socket.id)
+    delete users[socket.id]
   })
+})
+
+app.post('/login', (req, res) => {
+  const { name } = req.body
+  users[socketId] = name
+  console.log({ users })
+  // 最大人数以上は入らない
+  if (Object.keys(users).length <= MAX_NUMBER_OF_PEOPLE) {
+    res.json({ isEnter: true })
+  } else {
+    res.json({ isEnter: false })
+  }
 })
 
 server.listen(PORT, () => {
