@@ -32,11 +32,11 @@ const GAME_MEMBER_MAX = 5
 const GAME_MEMBER_MIN = 2
 const users = []
 let isStart = false
-let currentThemes = themes[Math.floor(Math.random() * themes.length)]
+let currentTheme
 let count = 0
 
 // 絵を描くひとを順番に返す
-const getCurrentDrawUser = (() => {
+const getDrawUser = (() => {
   let currentDrawUser
   return () => {
     if (
@@ -56,6 +56,13 @@ const getCurrentDrawUser = (() => {
     return currentDrawUser
   }
 })()
+
+// お題をランダムに返す
+const getTheme = ((themes) => {
+  return () => {
+    return themes[Math.floor(Math.random() * themes.length)]
+  }
+})(themes)
 
 app.get('/', (req, res) => {
   res.json({ health: 'ok' })
@@ -84,7 +91,22 @@ io.on('connection', (socket) => {
 
   // チャット送信のイベント
   socket.on('chat', (payload) => {
+    const { name, id, text } = payload
     broadCast('chat', payload)
+    if (text === currentTheme) {
+      io.emit('announce', {
+        type: 'correct',
+        userName: name
+      })
+
+      // お題を更新
+      currentTheme = getTheme()
+      io.emit('announce', {
+        type: 'nextTheme',
+        theme: currentTheme,
+        drawUserId: getDrawUser().id
+      })
+    }
   })
 
   // チャット送信のイベント
@@ -112,21 +134,22 @@ io.on('connection', (socket) => {
       if (users.length >= GAME_MEMBER_MIN && !isStart) {
         isStart = true
         count = 0
+        currentTheme = getTheme()
         // ? 入室を待つため，100msおく
         // ? すぐに送信するとHomeコンポーネントが呼ばれる前に送信しちゃう
         // TODO: そもそもSignInコンポーネントからenterしなちゃいいのでは？
         setTimeout(() => {
           io.emit('announce', {
             type: 'gameStart',
-            theme: currentThemes,
-            drawUserId: getCurrentDrawUser().id
+            theme: currentTheme,
+            drawUserId: getDrawUser().id
           })
         }, 100)
       } else if (isStart) {
         setTimeout(() => {
           io.emit('announce', {
             type: 'gameEnter',
-            theme: currentThemes,
+            theme: currentTheme,
             user: users.find((user) => user.id === socket.id)
           })
         })
@@ -143,13 +166,13 @@ io.on('connection', (socket) => {
       1
     )
     console.log('disconnect: ', users)
+    console.log('user length', users.length)
     // 1人になったらゲーム終了
     if (users.length <= 1) {
-      // globalSocket.on('gameEnd', () => {
-      //   io.emit('announce', {
-      //     type: 'gameEnd'
-      //   })
-      // })
+      isStart = false
+      io.emit('announce', {
+        type: 'gameEnd'
+      })
     }
   })
 })

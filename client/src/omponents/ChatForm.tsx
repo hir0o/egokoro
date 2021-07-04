@@ -27,7 +27,7 @@ const ChatForm: FC<PropsType> = ({ setMessages }) => {
         return
       }
       setMessages((prev) => [...prev, { name: user.name, text }])
-      socketEmit(socket, 'chat', { name: user.name, text })
+      socketEmit(socket, 'chat', { ...user, text })
       setText('')
     },
     [socket, text, setMessages, user]

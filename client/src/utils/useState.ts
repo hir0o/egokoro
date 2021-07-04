@@ -1,8 +1,8 @@
 import { Dispatch, SetStateAction } from 'react'
 
-export const setArrayValue = <T>(
-  value: T,
+export const addArrayState = <T>(
+  newValue: T,
   setValue: Dispatch<SetStateAction<T[]>>
-) => setValue((prev) => [...prev, value])
+) => setValue((prev) => [...prev, newValue])
 
 // TODO: Obje

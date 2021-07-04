@@ -21,7 +21,7 @@ type PropsType = {
 const Chat: FC<PropsType> = memo(({ setMessages, messages }) => {
   const socket = useContext(SocketContext)
 
-  // チャットの受診
+  // チャットの受信
   useEffect(() => {
     socketOn<MessageType>(socket, 'chat', (payload) => {
       setMessages((prev) => [

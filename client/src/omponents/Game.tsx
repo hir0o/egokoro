@@ -21,25 +21,35 @@ const Game: FC = memo(() => {
       // ゲームの開始
       switch (payload.type) {
         case 'gameStart':
-          const isDraw = user.id === payload.drawUserId
-          updateState(isDraw ? 'draw' : 'answer') // ユーザーのステータスを更新
-          setTheme(payload.theme as string) // お題を更新
-          setMessages((prev) => [
-            ...prev,
-            { name: 'announce', text: 'ゲームを開始します｡' },
-            {
-              name: 'announce',
-              text: isDraw ? 'あなたは絵を描きます｡' : 'あなたは回答します｡' // TODO: なんかもうちょいいい言い方
+          {
+            const isDraw = user.id === payload.drawUserId
+            updateState(isDraw ? 'draw' : 'answer') // ユーザーのステータスを更新
+            setTheme(isDraw ? (payload.theme as string) : '') // お題を更新
+            setMessages((prev) => [
+              ...prev,
+              { name: 'announce', text: 'ゲームを開始します｡' },
+              {
+                name: 'announce',
+                text: isDraw ? 'あなたは絵を描きます｡' : 'あなたは回答します｡' // TODO: なんかもうちょいいい言い方
+              }
+            ])
+            if (isDraw) {
+              setMessages((prev) => [
+                ...prev,
+                {
+                  name: 'announce',
+                  text: `お題は${payload.theme}です．`
+                }
+              ])
             }
-          ])
+          }
           break
         case 'gameEnter': // ゲーム中に人が入ってきた
           setTheme(payload.theme as string) // お題を更新
-          // 受信が入室した人だったら，お題と役割をお知らせ
+          // 受信が入室した人だったら，役割をお知らせ
           if ((payload.user as UserType)?.id === user.id) {
             setMessages((prev) => [
               ...prev,
-              { name: 'announce', text: `現在のお題は${payload.theme}です｡` },
               {
                 name: 'announce',
                 text: 'あなたは回答します｡'
@@ -56,10 +66,50 @@ const Game: FC = memo(() => {
             ])
           }
           break
+        case 'correct':
+          setMessages((prev) => [
+            ...prev,
+            {
+              name: 'announce',
+              text: `${payload.userName}さん正解！`
+            }
+          ])
+          break
+        case 'nextTheme': // 次のお題
+          {
+            const isDraw = user.id === payload.drawUserId
+            updateState(isDraw ? 'draw' : 'answer') // ユーザーのステータスを更新
+            setTheme(isDraw ? (payload.theme as string) : '') // お題を更新
+            setMessages((prev) => [
+              ...prev,
+              {
+                name: 'announce',
+                text: isDraw ? 'あなたは絵を描きます｡' : 'あなたは回答します｡'
+              }
+            ])
+            if (isDraw) {
+              setMessages((prev) => [
+                ...prev,
+                {
+                  name: 'announce',
+                  text: `お題は${payload.theme}です．`
+                }
+              ])
+            }
+          }
+          break
+        case 'gameEnd':
+          setMessages((prev) => [
+            ...prev,
+            {
+              name: 'announce',
+              text: 'ゲームを中断します．'
+            }
+          ])
+          break
         default:
           break
       }
-      // ゲームの終了
     })
     // TODO: react-hooks/exhaustive-depsだけ無効にする
     /* eslint-disable */
