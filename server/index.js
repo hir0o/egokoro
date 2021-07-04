@@ -115,7 +115,7 @@ app.post('/login', (req, res) => {
   const { id } = globalSocket
   users.push({ name, id })
   // 最大人数以上は入らない
-  if (roomMemberCount <= MAX_NUMBER_OF_PEOPLE) {
+  if (users.length <= MAX_NUMBER_OF_PEOPLE) {
     res.json({ isEnter: true, id })
   } else {
     res.json({ isEnter: false })
