@@ -10,7 +10,7 @@ export const socketEmit = (
   socket.emit(eventName, payload)
 }
 
-export const socketOn = <T>(
+export const socketOn = <T = { [key: string]: string | number | boolean }>(
   socket: Socket,
   eventName: EventType,
   func: (payload: T) => void

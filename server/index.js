@@ -29,7 +29,7 @@ app.use((req, res, next) => {
 app.use(express.json())
 
 const users = []
-let globalSocket
+let socketId
 const MAX_NUMBER_OF_PEOPLE = 5
 let isStart = false
 let currentThemes = themes[Math.floor(Math.random() * themes.length)]
@@ -62,7 +62,7 @@ app.get('/', (req, res) => {
 })
 
 io.on('connection', (socket) => {
-  globalSocket = socket
+  socketId = socket.id
   // 自分以外に送信する関数
   const broadCast = (eventName, payload) =>
     socket.broadcast.emit(eventName, payload)
@@ -93,29 +93,44 @@ io.on('connection', (socket) => {
   })
 
   // 入室時のイベント
-  socket.on('enter', () => {
-    // ゲーム開始する処理
-    if (users.length >= 2 && !isStart) {
-      isStart = true
-      count = 0
-      // ? 入室を待つため，100msおく
-      // ? すぐに送信するとHomeコンポーネントが呼ばれる前に送信しちゃう
-      // TODO: そもそもSignInコンポーネントからenterしなちゃいいのでは？
-      setTimeout(() => {
-        io.emit('announce', {
-          type: 'gameStart',
-          theme: currentThemes,
-          drawUserId: getCurrentDrawUser().id
+  socket.on('enter', (payload) => {
+    const { name } = payload
+    const { id } = socket
+
+    // 入室できるかどうか
+    if (users.length > MAX_NUMBER_OF_PEOPLE) {
+      io.to(socket.id).emit('enter', { isEnter: false })
+    } else {
+      // 入室ok
+      users.push({ name, id })
+
+      console.log({ users })
+
+      // 結果を送信
+      io.to(socket.id).emit('enter', { isEnter: true, id })
+
+      if (users.length >= 2 && !isStart) {
+        isStart = true
+        count = 0
+        // ? 入室を待つため，100msおく
+        // ? すぐに送信するとHomeコンポーネントが呼ばれる前に送信しちゃう
+        // TODO: そもそもSignInコンポーネントからenterしなちゃいいのでは？
+        setTimeout(() => {
+          io.emit('announce', {
+            type: 'gameStart',
+            theme: currentThemes,
+            drawUserId: getCurrentDrawUser().id
+          })
+        }, 100)
+      } else if (isStart) {
+        setTimeout(() => {
+          io.emit('announce', {
+            type: 'gameEnter',
+            theme: currentThemes,
+            user: users.find((user) => user.id === socket.id)
+          })
         })
-      }, 100)
-    } else if (isStart) {
-      setTimeout(() => {
-        io.emit('announce', {
-          type: 'gameEnter',
-          theme: currentThemes,
-          user: users.find((user) => user.id === socket.id)
-        })
-      })
+      }
     }
   })
 
@@ -127,26 +142,13 @@ io.on('connection', (socket) => {
     )
     // 1人になったらゲーム終了
     if (users.length <= 1) {
-      globalSocket.on('gameEnd', () => {
-        io.emit('announce', {
-          type: 'gameEnd'
-        })
-      })
+      // globalSocket.on('gameEnd', () => {
+      //   io.emit('announce', {
+      //     type: 'gameEnd'
+      //   })
+      // })
     }
   })
-})
-
-app.post('/login', (req, res) => {
-  const { name } = req.body
-  const { id } = globalSocket
-  users.push({ name, id })
-
-  // 最大人数以上は入らない
-  if (users.length <= MAX_NUMBER_OF_PEOPLE) {
-    res.json({ isEnter: true, id })
-  } else {
-    res.json({ isEnter: false })
-  }
 })
 
 server.listen(PORT, () => {})

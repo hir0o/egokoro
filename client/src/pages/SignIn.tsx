@@ -4,12 +4,12 @@ import {
   FormEvent,
   SetStateAction,
   useContext,
+  useEffect,
   useState
 } from 'react'
-import { ENDPOINT, SocketContext } from '../App'
-import axios from 'axios'
+import { SocketContext } from '../App'
 import { UserType } from '../types'
-import { socketEmit } from '../utils/socket'
+import { socketEmit, socketOn } from '../utils/socket'
 
 type PropsType = {
   setUser: Dispatch<SetStateAction<UserType>>
@@ -23,12 +23,12 @@ const SignIn: FC<PropsType> = ({ setUser }) => {
 
   const hundleSubmit = (e: FormEvent) => {
     e.preventDefault()
-    axios.post(`${ENDPOINT}/login`, { name: inputName }).then((res) => {
-      const { data } = res
-      if (data.isEnter) {
-        socketEmit(socket, 'enter', '')
+
+    socketEmit(socket, 'enter', { name: inputName })
+    socketOn(socket, 'enter', (payload) => {
+      if (payload.isEnter) {
         setUser((prev) => {
-          return { ...prev, name: inputName, id: data.id }
+          return { ...prev, name: inputName, id: payload.id as string }
         })
       } else {
         setIsEnter(false)
@@ -39,6 +39,7 @@ const SignIn: FC<PropsType> = ({ setUser }) => {
   return (
     <>
       <form onSubmit={(e) => hundleSubmit(e)}>
+        {inputName}
         <input
           type="text"
           name="name"
