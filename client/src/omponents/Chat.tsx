@@ -2,14 +2,19 @@ import { FC, useContext, useEffect, useState } from 'react'
 import MessageList from './MessageList'
 import ChatForm from './ChatForm'
 import { MessageType } from '../types'
-import { socketOn } from '../utils/socket'
-import { SocketContext } from '../App'
+import { socketEmit, socketOn } from '../utils/socket'
+import { SocketContext, UserContext } from '../App'
 
 const Chat: FC = () => {
   const [messages, setMessages] = useState<MessageType[]>([])
   const socket = useContext(SocketContext)
+  const user = useContext(UserContext)
 
   useEffect(() => {
+    // 入室の送信
+    socketEmit(socket, 'enter', '')
+
+    // チャットの受診
     socketOn<MessageType>(socket, 'chat', (payload) => {
       setMessages((prev) => [
         ...prev,
@@ -25,10 +30,14 @@ const Chat: FC = () => {
         // ゲームの開始
         switch (payload.type) {
           case 'gameStart':
+            const isDraw = user.id === payload.drawUserId
             setMessages((prev) => [
               ...prev,
               { name: 'announce', text: 'ゲームを開始します｡' },
-              { name: 'announce', text: '' }
+              {
+                name: 'announce',
+                text: isDraw ? 'あなたは絵を描きます｡' : 'あなたは回答します｡' // TODO: なんかもうちょいいい言い方
+              }
             ])
             break
           case 'gameEnd':
@@ -39,7 +48,7 @@ const Chat: FC = () => {
         // ゲームの終了
       }
     )
-  }, [socket])
+  }, [socket, user])
 
   return (
     <>

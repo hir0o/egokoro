@@ -93,6 +93,20 @@ io.on('connection', (socket) => {
     broadCast('next', payload)
   })
 
+  // 入室時のイベント
+  socket.on('enter', (payload) => {
+    // ゲーム開始する処理
+    if (users.length >= 2 && !isStart) {
+      isStart = true
+      count = 0
+      io.emit('announce', {
+        type: 'gameStart',
+        theme: currentThemes,
+        drawUserId: getCurrentDrawUser().id
+      })
+    }
+  })
+
   socket.on('disconnect', () => {
     // 離脱したユーザーを削除
     users.splice(
@@ -114,22 +128,12 @@ app.post('/login', (req, res) => {
   const { name } = req.body
   const { id } = globalSocket
   users.push({ name, id })
+
   // 最大人数以上は入らない
   if (users.length <= MAX_NUMBER_OF_PEOPLE) {
     res.json({ isEnter: true, id })
   } else {
     res.json({ isEnter: false })
-    // ゲーム開始する処理．
-    // 人数が2人以上 かつ ゲームが始まってない．
-    if (users.length > 2 && !isStart) {
-      isStart = true
-      count = 0
-      io.emit('announce', {
-        type: 'gameStart',
-        theme: currentThemes,
-        drawUserName: getCurrentDrawUser().id
-      })
-    }
   }
 })
 
