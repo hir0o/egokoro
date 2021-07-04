@@ -103,7 +103,7 @@ io.on('connection', (socket) => {
       // 入室ok
       users.push({ name, id })
 
-      console.log({ users })
+      console.log('enter: ', users)
 
       // 結果を送信
       io.to(socket.id).emit('enter', { isEnter: true, id })
@@ -141,6 +141,7 @@ io.on('connection', (socket) => {
       users.findIndex((user) => user.id === socket.id),
       1
     )
+    console.log('disconnect: ', users)
     // 1人になったらゲーム終了
     if (users.length <= 1) {
       // globalSocket.on('gameEnd', () => {
