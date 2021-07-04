@@ -6,8 +6,8 @@ import { UserType, StateType } from './types'
 export const ENDPOINT = 'http://127.0.0.1:5000'
 
 const userInitialState: UserType = {
-  name: '',
-  id: '',
+  name: 'waaa',
+  id: '12345',
   state: 'answer'
 }
 

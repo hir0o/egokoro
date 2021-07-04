@@ -4,6 +4,7 @@ import { MessageType, UserType } from '../types'
 import { socketOn } from '../utils/socket'
 import { addArrayState } from '../utils/useState'
 import Chat from './Chat'
+import DrawCanvas from './DrawCanvas'
 
 // ゲームの進行をつかさどるつもりコンポーネント
 
@@ -48,7 +49,7 @@ const Game: FC = memo(() => {
             )
           }
           break
-        case 'correct':
+        case 'correct': // 正解
           setAnnounce(`${payload.userName}さん正解！`)
           break
         case 'nextTheme': // 次のお題
@@ -81,7 +82,7 @@ const Game: FC = memo(() => {
       <h1>id: {user.id}</h1>
       <h1>state: {user.state}</h1>
       {user.state === 'draw' && <h1>theme: {theme}</h1>}
-      <canvas></canvas>
+      <DrawCanvas />
       <Chat messages={messages} setMessages={setMessages} />
     </div>
   )
