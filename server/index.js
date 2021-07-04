@@ -3,6 +3,7 @@ const app = express()
 const bodyParser = require('body-parser')
 const http = require('http')
 const server = http.createServer(app)
+const themes = require('./themes.json')
 
 const io = require('socket.io')(server, {
   cors: {
@@ -25,18 +26,43 @@ app.use((req, res, next) => {
   next()
 })
 
-app.use(bodyParser.json())
+app.use(express.json())
 
-const users = {}
-let socketId
+const users = []
+let globalSocket
 const MAX_NUMBER_OF_PEOPLE = 5
+let isStart = false
+let currentThemes = themes[Math.floor(Math.random() * themes.length)]
+let count = 0
+
+// 絵を描くひとを順番に返す
+const getCurrentDrawUser = (() => {
+  let currentDrawUser
+  return () => {
+    if (
+      currentDrawUser &&
+      users.some((user) => user.id === currentDrawUser.id)
+    ) {
+      let userIndex = users.findIndex((user) => user.id === currentDrawUser.id)
+      if (userIndex >= users.length - 1) {
+        currentDrawUser = users[0]
+      } else {
+        currentDrawUser =
+          users[users.findIndex((user) => user.id === currentDrawUser.id) + 1]
+      }
+    } else {
+      currentDrawUser = users[0]
+    }
+    return currentDrawUser
+  }
+})()
 
 app.get('/', (req, res) => {
-  res.json({ message: 'ok' })
+  res.json({ health: 'ok' })
 })
 
 io.on('connection', (socket) => {
-  socketId = socket.id
+  globalSocket = socket
   // 自分以外に送信する関数
   const broadCast = (eventName, payload) =>
     socket.broadcast.emit(eventName, payload)
@@ -58,24 +84,51 @@ io.on('connection', (socket) => {
 
   // チャット送信のイベント
   socket.on('chat', (payload) => {
+    console.log(getCurrentDrawUser())
     broadCast('chat', payload)
   })
 
+  // チャット送信のイベント
+  socket.on('next', (payload) => {
+    broadCast('next', payload)
+  })
+
   socket.on('disconnect', () => {
-    console.log(socket.id)
-    delete users[socket.id]
+    // 離脱したユーザーを削除
+    users.splice(
+      users.findIndex((user) => user.id === socket.id),
+      1
+    )
+    // 1人になったらゲーム終了
+    if (users.length <= 1) {
+      globalSocket.on('gameEnd', () => {
+        io.emit('announce', {
+          message: 'gameEnd'
+        })
+      })
+    }
   })
 })
 
 app.post('/login', (req, res) => {
   const { name } = req.body
-  users[socketId] = name
-  console.log({ users })
+  users.push({ name, id: globalSocket.id })
   // 最大人数以上は入らない
-  if (Object.keys(users).length <= MAX_NUMBER_OF_PEOPLE) {
+  if (roomMemberCount <= MAX_NUMBER_OF_PEOPLE) {
     res.json({ isEnter: true })
   } else {
     res.json({ isEnter: false })
+    // ゲーム開始する処理．
+    // 人数が2人以上 かつ ゲームが始まってない．
+    if (users.length > 2 && !isStart) {
+      isStart = true
+      count = 0
+      io.emit('announce', {
+        message: 'gameStart',
+        theme: currentThemes,
+        drawUserName: getCurrentDrawUser().name
+      })
+    }
   }
 })
 

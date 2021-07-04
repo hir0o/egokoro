@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io-client'
 
-type EventType = 'chat' | 'start' | 'move' | 'end'
+type EventType = 'chat' | 'start' | 'move' | 'end' | 'announce'
 
 export const socketEmit = (
   socket: Socket,

@@ -38,6 +38,7 @@ const ChatForm: FC<PropsType> = ({ setMessages }) => {
       <input
         type="text"
         value={text}
+        className="border"
         onChange={(e) => {
           setText(e.target.value)
         }}
