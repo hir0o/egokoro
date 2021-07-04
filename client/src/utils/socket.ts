@@ -1,6 +1,6 @@
 import { Socket } from 'socket.io-client'
 
-type EventType = 'chat' | 'start' | 'move' | 'end'
+type EventType = 'chat' | 'start' | 'move' | 'end' | 'announce' | 'enter'
 
 export const socketEmit = (
   socket: Socket,
@@ -10,7 +10,7 @@ export const socketEmit = (
   socket.emit(eventName, payload)
 }
 
-export const socketOn = <T>(
+export const socketOn = <T = { [key: string]: string | number | boolean }>(
   socket: Socket,
   eventName: EventType,
   func: (payload: T) => void

@@ -3,6 +3,7 @@ const app = express()
 const bodyParser = require('body-parser')
 const http = require('http')
 const server = http.createServer(app)
+const themes = require('./themes.json')
 
 const io = require('socket.io')(server, {
   cors: {
@@ -25,18 +26,50 @@ app.use((req, res, next) => {
   next()
 })
 
-app.use(bodyParser.json())
+app.use(express.json())
 
-const users = {}
-let socketId
-const MAX_NUMBER_OF_PEOPLE = 5
+const GAME_MEMBER_MAX = 5
+const GAME_MEMBER_MIN = 2
+const users = []
+let isStart = false
+let currentTheme
+let count = 0
+
+// 絵を描くひとを順番に返す
+const getDrawUser = (() => {
+  let currentDrawUser
+  return () => {
+    if (
+      currentDrawUser &&
+      users.some((user) => user.id === currentDrawUser.id)
+    ) {
+      let userIndex = users.findIndex((user) => user.id === currentDrawUser.id)
+      if (userIndex >= users.length - 1) {
+        currentDrawUser = users[0]
+      } else {
+        currentDrawUser =
+          users[users.findIndex((user) => user.id === currentDrawUser.id) + 1]
+      }
+    } else {
+      currentDrawUser = users[0]
+    }
+    return currentDrawUser
+  }
+})()
+
+// お題をランダムに返す
+const getTheme = ((themes) => {
+  return () => {
+    return themes[Math.floor(Math.random() * themes.length)]
+  }
+})(themes)
 
 app.get('/', (req, res) => {
-  res.json({ message: 'ok' })
+  res.json({ health: 'ok' })
 })
 
 io.on('connection', (socket) => {
-  socketId = socket.id
+  console.log('connect: ', socket.id)
   // 自分以外に送信する関数
   const broadCast = (eventName, payload) =>
     socket.broadcast.emit(eventName, payload)
@@ -58,27 +91,90 @@ io.on('connection', (socket) => {
 
   // チャット送信のイベント
   socket.on('chat', (payload) => {
+    const { name, id, text } = payload
     broadCast('chat', payload)
+    if (text === currentTheme) {
+      io.emit('announce', {
+        type: 'correct',
+        userName: name
+      })
+
+      // お題を更新
+      currentTheme = getTheme()
+      io.emit('announce', {
+        type: 'nextTheme',
+        theme: currentTheme,
+        drawUserId: getDrawUser().id
+      })
+    }
+  })
+
+  // チャット送信のイベント
+  socket.on('next', (payload) => {
+    broadCast('next', payload)
+  })
+
+  // 入室時のイベント
+  socket.on('enter', (payload) => {
+    const { name } = payload
+    const { id } = socket
+
+    // 入室できるかどうか
+    if (users.length > GAME_MEMBER_MAX) {
+      io.to(socket.id).emit('enter', { isEnter: false })
+    } else {
+      // 入室ok
+      users.push({ name, id })
+
+      console.log('enter: ', users)
+
+      // 結果を送信
+      io.to(socket.id).emit('enter', { isEnter: true, id })
+
+      if (users.length >= GAME_MEMBER_MIN && !isStart) {
+        isStart = true
+        count = 0
+        currentTheme = getTheme()
+        // ? 入室を待つため，100msおく
+        // ? すぐに送信するとHomeコンポーネントが呼ばれる前に送信しちゃう
+        // TODO: そもそもSignInコンポーネントからenterしなちゃいいのでは？
+        setTimeout(() => {
+          io.emit('announce', {
+            type: 'gameStart',
+            theme: currentTheme,
+            drawUserId: getDrawUser().id
+          })
+        }, 100)
+      } else if (isStart) {
+        setTimeout(() => {
+          io.emit('announce', {
+            type: 'gameEnter',
+            theme: currentTheme,
+            user: users.find((user) => user.id === socket.id)
+          })
+        })
+      }
+    }
   })
 
   socket.on('disconnect', () => {
-    console.log(socket.id)
-    delete users[socket.id]
+    // 不明なdisconnectを回避
+    if (!users.some((user) => user.id === socket.id)) return
+    // 離脱したユーザーを削除
+    users.splice(
+      users.findIndex((user) => user.id === socket.id),
+      1
+    )
+    console.log('disconnect: ', users)
+    console.log('user length', users.length)
+    // 1人になったらゲーム終了
+    if (users.length <= 1) {
+      isStart = false
+      io.emit('announce', {
+        type: 'gameEnd'
+      })
+    }
   })
 })
 
-app.post('/login', (req, res) => {
-  const { name } = req.body
-  users[socketId] = name
-  console.log({ users })
-  // 最大人数以上は入らない
-  if (Object.keys(users).length <= MAX_NUMBER_OF_PEOPLE) {
-    res.json({ isEnter: true })
-  } else {
-    res.json({ isEnter: false })
-  }
-})
-
-server.listen(PORT, () => {
-  console.log(`istening on *:${PORT}`)
-})
+server.listen(PORT, () => {})

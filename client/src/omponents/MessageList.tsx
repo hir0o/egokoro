@@ -9,8 +9,8 @@ type PropsType = {
 const MessageList: FC<PropsType> = ({ messages }) => {
   return (
     <ul className="border border-gray-400">
-      {messages.map(({ name, text }) => (
-        <MessageItem name={name} text={text} />
+      {messages.map(({ name, text }, index) => (
+        <MessageItem name={name} text={text} key={index} />
       ))}
     </ul>
   )
