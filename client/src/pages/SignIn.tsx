@@ -1,12 +1,13 @@
 import { Dispatch, FC, FormEvent, SetStateAction, useState } from 'react'
 import { ENDPOINT } from '../App'
 import axios from 'axios'
+import { UserType } from '../types'
 
 type PropsType = {
-  setName: Dispatch<SetStateAction<string>>
+  setUser: Dispatch<SetStateAction<UserType>>
 }
 
-const SignIn: FC<PropsType> = ({ setName }) => {
+const SignIn: FC<PropsType> = ({ setUser }) => {
   const [inputName, setInputName] = useState('')
   const [isEnter, setIsEnter] = useState(true)
 
@@ -15,7 +16,10 @@ const SignIn: FC<PropsType> = ({ setName }) => {
     axios.post(`${ENDPOINT}/login`, { name: inputName }).then((res) => {
       const { data } = res
       if (data.isEnter) {
-        setName(inputName)
+        setUser({
+          name: inputName,
+          id: data.id
+        })
       } else {
         setIsEnter(false)
       }

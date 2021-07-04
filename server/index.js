@@ -103,7 +103,7 @@ io.on('connection', (socket) => {
     if (users.length <= 1) {
       globalSocket.on('gameEnd', () => {
         io.emit('announce', {
-          message: 'gameEnd'
+          type: 'gameEnd'
         })
       })
     }
@@ -112,10 +112,11 @@ io.on('connection', (socket) => {
 
 app.post('/login', (req, res) => {
   const { name } = req.body
-  users.push({ name, id: globalSocket.id })
+  const { id } = globalSocket
+  users.push({ name, id })
   // 最大人数以上は入らない
   if (roomMemberCount <= MAX_NUMBER_OF_PEOPLE) {
-    res.json({ isEnter: true })
+    res.json({ isEnter: true, id })
   } else {
     res.json({ isEnter: false })
     // ゲーム開始する処理．
@@ -124,9 +125,9 @@ app.post('/login', (req, res) => {
       isStart = true
       count = 0
       io.emit('announce', {
-        message: 'gameStart',
+        type: 'gameStart',
         theme: currentThemes,
-        drawUserName: getCurrentDrawUser().name
+        drawUserName: getCurrentDrawUser().id
       })
     }
   }

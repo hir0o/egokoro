@@ -6,7 +6,7 @@ import {
   useContext,
   useState
 } from 'react'
-import { SocketContext, NameContext } from '../App'
+import { SocketContext, UserContext } from '../App'
 import { MessageType } from '../types'
 import { socketEmit } from '../utils/socket'
 type PropsType = {
@@ -16,7 +16,7 @@ type PropsType = {
 const ChatForm: FC<PropsType> = ({ setMessages }) => {
   const [text, setText] = useState('')
   const socket = useContext(SocketContext)
-  const name = useContext(NameContext)
+  const user = useContext(UserContext)
 
   const hundleSubmit = (e: FormEvent) => {
     e.preventDefault()
@@ -24,8 +24,8 @@ const ChatForm: FC<PropsType> = ({ setMessages }) => {
       alert('テキストを入力してください．')
       return
     }
-    setMessages((prev) => [...prev, { name, text }])
-    socketEmit(socket, 'chat', { name, text })
+    setMessages((prev) => [...prev, { name: user.name, text }])
+    socketEmit(socket, 'chat', { name: user.name, text })
     setText('')
   }
 

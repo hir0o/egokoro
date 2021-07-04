@@ -16,6 +16,29 @@ const Chat: FC = () => {
         { name: payload.name, text: payload.text }
       ])
     })
+
+    // アナウンス
+    socketOn<{ [key: string]: string | number }>(
+      socket,
+      'announce',
+      (payload) => {
+        // ゲームの開始
+        switch (payload.type) {
+          case 'gameStart':
+            setMessages((prev) => [
+              ...prev,
+              { name: 'announce', text: 'ゲームを開始します｡' },
+              { name: 'announce', text: '' }
+            ])
+            break
+          case 'gameEnd':
+            break
+          default:
+            break
+        }
+        // ゲームの終了
+      }
+    )
   }, [socket])
 
   return (
