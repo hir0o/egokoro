@@ -84,7 +84,6 @@ io.on('connection', (socket) => {
 
   // チャット送信のイベント
   socket.on('chat', (payload) => {
-    console.log(getCurrentDrawUser())
     broadCast('chat', payload)
   })
 
@@ -94,7 +93,7 @@ io.on('connection', (socket) => {
   })
 
   // 入室時のイベント
-  socket.on('enter', (payload) => {
+  socket.on('enter', () => {
     // ゲーム開始する処理
     if (users.length >= 2 && !isStart) {
       isStart = true
@@ -103,6 +102,12 @@ io.on('connection', (socket) => {
         type: 'gameStart',
         theme: currentThemes,
         drawUserId: getCurrentDrawUser().id
+      })
+    } else if (isStart) {
+      io.emit('announce', {
+        type: 'gameEnter',
+        theme: currentThemes,
+        userName: users[users.length - 1].name
       })
     }
   })
@@ -137,6 +142,4 @@ app.post('/login', (req, res) => {
   }
 })
 
-server.listen(PORT, () => {
-  console.log(`istening on *:${PORT}`)
-})
+server.listen(PORT, () => {})

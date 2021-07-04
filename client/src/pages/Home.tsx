@@ -11,6 +11,7 @@ const Home: FC<PropsType> = ({ user }) => {
     <div>
       <h1>name: {user.name}</h1>
       <h1>id: {user.id}</h1>
+      <h1>state: {user.state}</h1>
       <Chat />
     </div>
   )

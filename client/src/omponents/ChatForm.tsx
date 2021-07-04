@@ -3,12 +3,14 @@ import {
   FC,
   FormEvent,
   SetStateAction,
+  useCallback,
   useContext,
+  useEffect,
   useState
 } from 'react'
 import { SocketContext, UserContext } from '../App'
 import { MessageType } from '../types'
-import { socketEmit } from '../utils/socket'
+import { socketEmit, socketOn } from '../utils/socket'
 type PropsType = {
   setMessages: Dispatch<SetStateAction<MessageType[]>>
 }
@@ -16,18 +18,21 @@ type PropsType = {
 const ChatForm: FC<PropsType> = ({ setMessages }) => {
   const [text, setText] = useState('')
   const socket = useContext(SocketContext)
-  const user = useContext(UserContext)
+  const { user, updateState } = useContext(UserContext)
 
-  const hundleSubmit = (e: FormEvent) => {
-    e.preventDefault()
-    if (text === '') {
-      alert('テキストを入力してください．')
-      return
-    }
-    setMessages((prev) => [...prev, { name: user.name, text }])
-    socketEmit(socket, 'chat', { name: user.name, text })
-    setText('')
-  }
+  const hundleSubmit = useCallback(
+    (e: FormEvent) => {
+      e.preventDefault()
+      if (text === '') {
+        alert('テキストを入力してください．')
+        return
+      }
+      setMessages((prev) => [...prev, { name: user.name, text }])
+      socketEmit(socket, 'chat', { name: user.name, text })
+      setText('')
+    },
+    [socket, text, setMessages, user]
+  )
 
   return (
     <form
