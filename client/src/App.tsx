@@ -35,7 +35,7 @@ const App: VFC = () => {
     // TODO: Context用のコンポーネントを作成
     <SocketContext.Provider value={socket}>
       <UserContext.Provider value={{ user, updateState }}>
-        <Home user={user} />
+        <Home />
       </UserContext.Provider>
     </SocketContext.Provider>
   )

@@ -98,16 +98,23 @@ io.on('connection', (socket) => {
     if (users.length >= 2 && !isStart) {
       isStart = true
       count = 0
-      io.emit('announce', {
-        type: 'gameStart',
-        theme: currentThemes,
-        drawUserId: getCurrentDrawUser().id
-      })
+      // ? 入室を待つため，100msおく
+      // ? すぐに送信するとHomeコンポーネントが呼ばれる前に送信しちゃう
+      // TODO: そもそもSignInコンポーネントからenterしなちゃいいのでは？
+      setTimeout(() => {
+        io.emit('announce', {
+          type: 'gameStart',
+          theme: currentThemes,
+          drawUserId: getCurrentDrawUser().id
+        })
+      }, 100)
     } else if (isStart) {
-      io.emit('announce', {
-        type: 'gameEnter',
-        theme: currentThemes,
-        userName: users[users.length - 1].name
+      setTimeout(() => {
+        io.emit('announce', {
+          type: 'gameEnter',
+          theme: currentThemes,
+          user: users.find((user) => user.id === socket.id)
+        })
       })
     }
   })

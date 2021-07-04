@@ -5,12 +5,11 @@ import {
   SetStateAction,
   useCallback,
   useContext,
-  useEffect,
   useState
 } from 'react'
 import { SocketContext, UserContext } from '../App'
 import { MessageType } from '../types'
-import { socketEmit, socketOn } from '../utils/socket'
+import { socketEmit } from '../utils/socket'
 type PropsType = {
   setMessages: Dispatch<SetStateAction<MessageType[]>>
 }
@@ -18,7 +17,7 @@ type PropsType = {
 const ChatForm: FC<PropsType> = ({ setMessages }) => {
   const [text, setText] = useState('')
   const socket = useContext(SocketContext)
-  const { user, updateState } = useContext(UserContext)
+  const { user } = useContext(UserContext)
 
   const hundleSubmit = useCallback(
     (e: FormEvent) => {

@@ -1,18 +1,10 @@
 import { FC } from 'react'
-import Chat from '../omponents/Chat'
-import { UserType } from '../types'
+import Game from '../omponents/Game'
 
-type PropsType = {
-  user: UserType
-}
-
-const Home: FC<PropsType> = ({ user }) => {
+const Home: FC = () => {
   return (
     <div>
-      <h1>name: {user.name}</h1>
-      <h1>id: {user.id}</h1>
-      <h1>state: {user.state}</h1>
-      <Chat />
+      <Game />
     </div>
   )
 }
