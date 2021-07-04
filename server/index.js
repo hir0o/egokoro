@@ -28,8 +28,9 @@ app.use((req, res, next) => {
 
 app.use(express.json())
 
+const GAME_MEMBER_MAX = 5
+const GAME_MEMBER_MIN = 2
 const users = []
-const MAX_NUMBER_OF_PEOPLE = 5
 let isStart = false
 let currentThemes = themes[Math.floor(Math.random() * themes.length)]
 let count = 0
@@ -97,7 +98,7 @@ io.on('connection', (socket) => {
     const { id } = socket
 
     // 入室できるかどうか
-    if (users.length > MAX_NUMBER_OF_PEOPLE) {
+    if (users.length > GAME_MEMBER_MAX) {
       io.to(socket.id).emit('enter', { isEnter: false })
     } else {
       // 入室ok
@@ -108,7 +109,7 @@ io.on('connection', (socket) => {
       // 結果を送信
       io.to(socket.id).emit('enter', { isEnter: true, id })
 
-      if (users.length >= 2 && !isStart) {
+      if (users.length >= GAME_MEMBER_MIN && !isStart) {
         isStart = true
         count = 0
         // ? 入室を待つため，100msおく
