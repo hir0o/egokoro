@@ -2,6 +2,7 @@ import { FC, memo, useContext, useEffect, useState } from 'react'
 import { SocketContext, UserContext } from '../App'
 import { MessageType, UserType } from '../types'
 import { socketOn } from '../utils/socket'
+import { addArrayState } from '../utils/useState'
 import Chat from './Chat'
 
 // ゲームの進行をつかさどるつもりコンポーネント
@@ -10,6 +11,9 @@ const Game: FC = memo(() => {
   const { user, updateState } = useContext(UserContext)
   const socket = useContext(SocketContext)
   const [messages, setMessages] = useState<MessageType[]>([])
+
+  const setAnnounce = (text: string) =>
+    addArrayState<MessageType>({ name: 'announce', text }, setMessages)
 
   const [theme, setTheme] = useState('')
 
@@ -25,87 +29,43 @@ const Game: FC = memo(() => {
             const isDraw = user.id === payload.drawUserId
             updateState(isDraw ? 'draw' : 'answer') // ユーザーのステータスを更新
             setTheme(isDraw ? (payload.theme as string) : '') // お題を更新
-            setMessages((prev) => [
-              ...prev,
-              { name: 'announce', text: 'ゲームを開始します｡' },
-              {
-                name: 'announce',
-                text: isDraw ? 'あなたは絵を描きます｡' : 'あなたは回答します｡' // TODO: なんかもうちょいいい言い方
-              }
-            ])
-            if (isDraw) {
-              setMessages((prev) => [
-                ...prev,
-                {
-                  name: 'announce',
-                  text: `お題は${payload.theme}です．`
-                }
-              ])
-            }
+            setAnnounce('ゲームを開始します｡')
+            setAnnounce(
+              isDraw ? 'あなたは絵を描きます｡' : 'あなたは回答します｡' // TODO: なんかもうちょいいい言い方
+            )
+            if (isDraw) setAnnounce(`お題は${payload.theme}です．`)
           }
           break
         case 'gameEnter': // ゲーム中に人が入ってきた
           setTheme(payload.theme as string) // お題を更新
           // 受信が入室した人だったら，役割をお知らせ
           if ((payload.user as UserType)?.id === user.id) {
-            setMessages((prev) => [
-              ...prev,
-              {
-                name: 'announce',
-                text: 'あなたは回答します｡'
-              }
-            ])
+            setAnnounce('あなたは回答します｡')
           } else {
             // 他の人に入室をお知らせ
-            setMessages((prev) => [
-              ...prev,
-              {
-                name: 'announce',
-                text: `${(payload.user as UserType)?.name}さんが入室しました｡`
-              }
-            ])
+            setAnnounce(
+              `${(payload.user as UserType)?.name}さんが入室しました｡`
+            )
           }
           break
         case 'correct':
-          setMessages((prev) => [
-            ...prev,
-            {
-              name: 'announce',
-              text: `${payload.userName}さん正解！`
-            }
-          ])
+          setAnnounce(`${payload.userName}さん正解！`)
           break
         case 'nextTheme': // 次のお題
           {
             const isDraw = user.id === payload.drawUserId
             updateState(isDraw ? 'draw' : 'answer') // ユーザーのステータスを更新
             setTheme(isDraw ? (payload.theme as string) : '') // お題を更新
-            setMessages((prev) => [
-              ...prev,
-              {
-                name: 'announce',
-                text: isDraw ? 'あなたは絵を描きます｡' : 'あなたは回答します｡'
-              }
-            ])
+            setAnnounce(
+              isDraw ? 'あなたは絵を描きます｡' : 'あなたは回答します｡'
+            )
             if (isDraw) {
-              setMessages((prev) => [
-                ...prev,
-                {
-                  name: 'announce',
-                  text: `お題は${payload.theme}です．`
-                }
-              ])
+              setAnnounce(`お題は${payload.theme}です．`)
             }
           }
           break
         case 'gameEnd':
-          setMessages((prev) => [
-            ...prev,
-            {
-              name: 'announce',
-              text: 'ゲームを中断します．'
-            }
-          ])
+          setAnnounce('ゲームを中断します．')
           break
         default:
           break
