@@ -29,7 +29,6 @@ app.use((req, res, next) => {
 app.use(express.json())
 
 const users = []
-let socketId
 const MAX_NUMBER_OF_PEOPLE = 5
 let isStart = false
 let currentThemes = themes[Math.floor(Math.random() * themes.length)]
@@ -62,7 +61,7 @@ app.get('/', (req, res) => {
 })
 
 io.on('connection', (socket) => {
-  socketId = socket.id
+  console.log('connect: ', socket.id)
   // 自分以外に送信する関数
   const broadCast = (eventName, payload) =>
     socket.broadcast.emit(eventName, payload)
@@ -135,6 +134,8 @@ io.on('connection', (socket) => {
   })
 
   socket.on('disconnect', () => {
+    // 不明なdisconnectを回避
+    if (!users.some((user) => user.id === socket.id)) return
     // 離脱したユーザーを削除
     users.splice(
       users.findIndex((user) => user.id === socket.id),
