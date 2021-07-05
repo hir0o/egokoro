@@ -39,7 +39,7 @@ const SignIn: FC<PropsType> = ({ setUser }) => {
   return (
     <>
       <form onSubmit={(e) => hundleSubmit(e)}>
-        {inputName}
+        <p>わああ</p>
         <input
           type="text"
           name="name"
