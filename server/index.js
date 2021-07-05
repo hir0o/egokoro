@@ -4,6 +4,16 @@ const bodyParser = require('body-parser')
 const http = require('http')
 const server = http.createServer(app)
 const themes = require('./themes.json')
+const Canvas = require('canvas') // node-canvasの読み込み
+
+// canvas関連
+const canvas = Canvas.createCanvas(800, 600)
+const context = canvas.getContext('2d')
+context.fillStyle = '#ffffff'
+const lastPosition = { x: null, y: null }
+let isDrag = false
+context.lineCap = 'round'
+context.lineJoin = 'round'
 
 const io = require('socket.io')(server, {
   cors: {
@@ -27,6 +37,10 @@ app.use((req, res, next) => {
 })
 
 app.use(express.json())
+
+app.get('/', (req, res) => {
+  res.json(data)
+})
 
 const GAME_MEMBER_MAX = 5
 const GAME_MEMBER_MIN = 2
@@ -76,28 +90,55 @@ io.on('connection', (socket) => {
 
   // 描画の開始
   socket.on('start', (payload) => {
-    broadCast('start', payload)
+    const { tool, color, size } = payload
+    context.beginPath()
+    isDrag = true
+    context.lineWidth = size
+    context.strokeStyle = tool === 'pen' ? color : '#FFFFFF'
+    broadCast('start', { data: canvas.toDataURL() })
   })
 
   // マウスが動いているイベント
   socket.on('move', (payload) => {
-    broadCast('move', payload)
+    const { x, y } = payload
+    if (!isDrag) {
+      return
+    }
+    if (lastPosition.x === null || lastPosition.y === null) {
+      context.moveTo(x, y)
+    } else {
+      context.moveTo(lastPosition.x, lastPosition.y)
+    }
+    context.lineTo(x, y)
+    context.stroke()
+
+    lastPosition.x = x
+    lastPosition.y = y
+    broadCast('move', { data: canvas.toDataURL() })
   })
 
   // マウスが離れたイベント
-  socket.on('end', (payload) => {
-    broadCast('end', payload)
+  socket.on('end', () => {
+    context.closePath()
+    isDrag = false
+    lastPosition.x = null
+    lastPosition.y = null
+    broadCast('end', { data: canvas.toDataURL() })
   })
 
   // チャット送信のイベント
   socket.on('chat', (payload) => {
     const { name, id, text } = payload
     broadCast('chat', payload)
+
+    // 問題に正解した場合
     if (text === currentTheme) {
       io.emit('announce', {
         type: 'correct',
         userName: name
       })
+      // 画像をクリア
+      context.clearRect(0, 0, canvas.width, canvas.height)
 
       // お題を更新
       currentTheme = getTheme()
