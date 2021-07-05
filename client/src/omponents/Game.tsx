@@ -1,16 +1,17 @@
 import { FC, memo, useContext, useEffect, useState } from 'react'
 import { SocketContext, UserContext } from '../App'
-import { MessageType, UserType } from '../types'
+import { LineType, MessageType, UserType } from '../types'
 import { socketOn } from '../utils/socket'
 import { addArrayState } from '../utils/useState'
 import Chat from './Chat'
-
-// ゲームの進行をつかさどるつもりコンポーネント
+import DrawCanvas from './DrawCanvas'
 
 const Game: FC = memo(() => {
   const { user, updateState } = useContext(UserContext)
   const socket = useContext(SocketContext)
   const [messages, setMessages] = useState<MessageType[]>([])
+  const [lines, setLines] = useState<LineType[]>([])
+  const [imageData, setImageData] = useState('')
 
   const setAnnounce = (text: string) =>
     addArrayState<MessageType>({ name: 'announce', text }, setMessages)
@@ -27,13 +28,18 @@ const Game: FC = memo(() => {
         case 'gameStart':
           {
             const isDraw = user.id === payload.drawUserId
+            setImageData('') //画像を初期化
             updateState(isDraw ? 'draw' : 'answer') // ユーザーのステータスを更新
             setTheme(isDraw ? (payload.theme as string) : '') // お題を更新
             setAnnounce('ゲームを開始します｡')
             setAnnounce(
               isDraw ? 'あなたは絵を描きます｡' : 'あなたは回答します｡' // TODO: なんかもうちょいいい言い方
             )
-            if (isDraw) setAnnounce(`お題は${payload.theme}です．`)
+            // 描く人の場合
+            if (isDraw) {
+              setAnnounce(`お題は${payload.theme}です．`)
+              setLines([])
+            }
           }
           break
         case 'gameEnter': // ゲーム中に人が入ってきた
@@ -54,6 +60,7 @@ const Game: FC = memo(() => {
         case 'nextTheme': // 次のお題
           {
             const isDraw = user.id === payload.drawUserId
+            setImageData('') //画像を初期化
             updateState(isDraw ? 'draw' : 'answer') // ユーザーのステータスを更新
             setTheme(isDraw ? (payload.theme as string) : '') // お題を更新
             setAnnounce(
@@ -61,11 +68,13 @@ const Game: FC = memo(() => {
             )
             if (isDraw) {
               setAnnounce(`お題は${payload.theme}です．`)
+              setLines([])
             }
           }
           break
         case 'gameEnd':
           setAnnounce('ゲームを中断します．')
+          setLines([])
           break
         default:
           break
@@ -81,8 +90,13 @@ const Game: FC = memo(() => {
       <h1>id: {user.id}</h1>
       <h1>state: {user.state}</h1>
       {user.state === 'draw' && <h1>theme: {theme}</h1>}
-      <canvas></canvas>
       <Chat messages={messages} setMessages={setMessages} />
+      <DrawCanvas
+        lines={lines}
+        setLines={setLines}
+        imageData={imageData}
+        setImageData={setImageData}
+      />
     </div>
   )
 })

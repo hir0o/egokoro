@@ -12,7 +12,7 @@ export type UserType = {
 }
 
 export type LineType = {
-  tool: string
+  tool: 'pen' | 'eraser'
   points: [number, number]
   color: string
   size: number

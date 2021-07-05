@@ -90,7 +90,6 @@ io.on('connection', (socket) => {
 
   // 描画の開始
   socket.on('start', (payload) => {
-    console.log('start: ', payload)
     const { tool, color, size } = payload
     context.beginPath()
     isDrag = true
@@ -101,9 +100,7 @@ io.on('connection', (socket) => {
 
   // マウスが動いているイベント
   socket.on('move', (payload) => {
-    console.log('move: ', payload)
     const { x, y } = payload
-    console.log(x, y)
     if (!isDrag) {
       return
     }
@@ -126,7 +123,6 @@ io.on('connection', (socket) => {
     isDrag = false
     lastPosition.x = null
     lastPosition.y = null
-    console.log('end_data: ', canvas.toDataURL())
     broadCast('end', { data: canvas.toDataURL() })
   })
 
@@ -134,11 +130,15 @@ io.on('connection', (socket) => {
   socket.on('chat', (payload) => {
     const { name, id, text } = payload
     broadCast('chat', payload)
+
+    // 問題に正解した場合
     if (text === currentTheme) {
       io.emit('announce', {
         type: 'correct',
         userName: name
       })
+      // 画像をクリア
+      context.clearRect(0, 0, canvas.width, canvas.height)
 
       // お題を更新
       currentTheme = getTheme()
