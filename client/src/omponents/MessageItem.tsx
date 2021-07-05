@@ -7,7 +7,7 @@ type PropsType = {
 
 const MessageItem: FC<PropsType> = ({ name, text }) => {
   return (
-    <li className={`border ${name === 'announce' && 'bg-green-200'}`}>
+    <li className={`border-b p-2 ${name === 'announce' && 'bg-green-200'} `}>
       {name}: {text}
     </li>
   )

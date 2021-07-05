@@ -35,6 +35,7 @@ const ChatForm: FC<PropsType> = ({ setMessages }) => {
 
   return (
     <form
+      className="w-full bg-black p-1"
       onSubmit={(e) => {
         hundleSubmit(e)
       }}
@@ -42,7 +43,7 @@ const ChatForm: FC<PropsType> = ({ setMessages }) => {
       <input
         type="text"
         value={text}
-        className="border"
+        className="border w-full"
         onChange={(e) => {
           setText(e.target.value)
         }}

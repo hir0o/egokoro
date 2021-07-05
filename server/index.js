@@ -7,7 +7,7 @@ const themes = require('./themes.json')
 const Canvas = require('canvas') // node-canvasの読み込み
 
 // canvas関連
-const canvas = Canvas.createCanvas(800, 600)
+const canvas = Canvas.createCanvas(600, 400)
 const context = canvas.getContext('2d')
 context.fillStyle = '#ffffff'
 const lastPosition = { x: null, y: null }
@@ -183,7 +183,8 @@ io.on('connection', (socket) => {
           io.emit('announce', {
             type: 'gameStart',
             theme: currentTheme,
-            drawUserId: getDrawUser().id
+            drawUserId: getDrawUser().id,
+            data: canvas.toDataURL()
           })
         }, 100)
       } else if (isStart) {
@@ -191,7 +192,8 @@ io.on('connection', (socket) => {
           io.emit('announce', {
             type: 'gameEnter',
             theme: currentTheme,
-            user: users.find((user) => user.id === socket.id)
+            user: users.find((user) => user.id === socket.id),
+            data: canvas.toDataURL()
           })
         })
       }
@@ -210,6 +212,8 @@ io.on('connection', (socket) => {
     console.log('user length', users.length)
     // 1人になったらゲーム終了
     if (users.length <= 1) {
+      // 画像をクリア
+      context.clearRect(0, 0, canvas.width, canvas.height)
       isStart = false
       io.emit('announce', {
         type: 'gameEnd'

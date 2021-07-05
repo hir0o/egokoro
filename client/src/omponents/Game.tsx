@@ -1,4 +1,12 @@
-import { FC, memo, useContext, useEffect, useState } from 'react'
+import {
+  Dispatch,
+  memo,
+  SetStateAction,
+  useContext,
+  useEffect,
+  useState,
+  VFC
+} from 'react'
 import { SocketContext, UserContext } from '../App'
 import { LineType, MessageType, UserType } from '../types'
 import { socketOn } from '../utils/socket'
@@ -6,7 +14,12 @@ import { addArrayState } from '../utils/useState'
 import Chat from './Chat'
 import DrawCanvas from './DrawCanvas'
 
-const Game: FC = memo(() => {
+type PropType = {
+  theme: string
+  setTheme: Dispatch<SetStateAction<string>>
+}
+
+const Game: VFC<PropType> = memo(({ theme, setTheme }) => {
   const { user, updateState } = useContext(UserContext)
   const socket = useContext(SocketContext)
   const [messages, setMessages] = useState<MessageType[]>([])
@@ -15,8 +28,6 @@ const Game: FC = memo(() => {
 
   const setAnnounce = (text: string) =>
     addArrayState<MessageType>({ name: 'announce', text }, setMessages)
-
-  const [theme, setTheme] = useState('')
 
   // TODO: 長いからどっか移す
   useEffect(() => {
@@ -28,7 +39,7 @@ const Game: FC = memo(() => {
         case 'gameStart':
           {
             const isDraw = user.id === payload.drawUserId
-            setImageData('') //画像を初期化
+            setImageData(payload.data as string)
             updateState(isDraw ? 'draw' : 'answer') // ユーザーのステータスを更新
             setTheme(isDraw ? (payload.theme as string) : '') // お題を更新
             setAnnounce('ゲームを開始します｡')
@@ -46,6 +57,7 @@ const Game: FC = memo(() => {
           setTheme(payload.theme as string) // お題を更新
           // 受信が入室した人だったら，役割をお知らせ
           if ((payload.user as UserType)?.id === user.id) {
+            setImageData(payload.data as string)
             setAnnounce('あなたは回答します｡')
           } else {
             // 他の人に入室をお知らせ
@@ -85,18 +97,14 @@ const Game: FC = memo(() => {
   }, [])
   /* eslint-able */
   return (
-    <div>
-      <h1>name: {user.name}</h1>
-      <h1>id: {user.id}</h1>
-      <h1>state: {user.state}</h1>
-      {user.state === 'draw' && <h1>theme: {theme}</h1>}
-      <Chat messages={messages} setMessages={setMessages} />
+    <div className="flex flex-wrap">
       <DrawCanvas
         lines={lines}
         setLines={setLines}
         imageData={imageData}
         setImageData={setImageData}
       />
+      <Chat messages={messages} setMessages={setMessages} />
     </div>
   )
 })
