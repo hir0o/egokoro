@@ -10,3 +10,10 @@ export type UserType = {
   id: string
   state: StateType
 }
+
+export type LineType = {
+  tool: string
+  points: [number, number]
+  color: string
+  size: number
+}
