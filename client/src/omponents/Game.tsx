@@ -29,7 +29,6 @@ const Game: VFC<PropType> = memo(({ theme, setTheme }) => {
   const setAnnounce = (text: string) =>
     addArrayState<MessageType>({ name: 'announce', text }, setMessages)
 
-  // TODO: 長いからどっか移す
   useEffect(() => {
     socketOn<{
       [key: string]: string | number | { [key: string]: string | number }
@@ -48,7 +47,7 @@ const Game: VFC<PropType> = memo(({ theme, setTheme }) => {
             )
             // 描く人の場合
             if (isDraw) {
-              setAnnounce(`お題は${payload.theme}です．`)
+              setAnnounce(`お題は『${payload.theme}』です．`)
               setLines([])
             }
           }
@@ -79,7 +78,7 @@ const Game: VFC<PropType> = memo(({ theme, setTheme }) => {
               isDraw ? 'あなたは絵を描きます｡' : 'あなたは回答します｡'
             )
             if (isDraw) {
-              setAnnounce(`お題は${payload.theme}です．`)
+              setAnnounce(`お題は『${payload.theme}』です．`)
               setLines([])
             }
           }
