@@ -98,18 +98,18 @@ const DrawCanvas: FC<PropsType> = ({
   })
 
   const style = {
-    backgroundColor: '#ffffff',
-    width: '800px',
-    height: '600px'
+    width: '600px',
+    height: '400px'
   }
 
   return (
     <>
       {user.state === 'draw' ? (
-        <>
-          <div className="flex">
+        <div className="border sm:mx-auto">
+          <div className="flex border-b p-3">
             <select
               value={tool}
+              className="border"
               onChange={(e) => {
                 setTool(e.target.value as 'pen' | 'eraser')
               }}
@@ -119,6 +119,7 @@ const DrawCanvas: FC<PropsType> = ({
             </select>
             <select
               value={size}
+              className="border ml-2"
               onChange={(e) => {
                 setSize(Number(e.target.value))
               }}
@@ -129,50 +130,46 @@ const DrawCanvas: FC<PropsType> = ({
               <option value="15">15</option>
               <option value="20">20</option>
             </select>
-          </div>
-          <div className="flex">
-            <div style={style}>
-              <Stage
-                width={800}
-                height={500}
-                onMouseDown={handleMouseDown}
-                onMousemove={handleMouseMove}
-                onMouseup={handleMouseUp}
-                style={{
-                  border: 'solid',
-                  marginTop: '10px'
-                }}
-              >
-                <Layer>
-                  {lines.map((line, i) => (
-                    <Line
-                      key={i}
-                      points={line.points}
-                      stroke={line.color}
-                      strokeWidth={line.size}
-                      tension={0.5}
-                      lineCap="round"
-                      globalCompositeOperation={
-                        line.tool === 'eraser'
-                          ? 'destination-out'
-                          : 'source-over'
-                      }
-                    />
-                  ))}
-                </Layer>
-              </Stage>
-            </div>
             <input
               type="color"
               value={color}
+              className="border ml-2"
               onChange={(e) => {
                 setColor(e.target.value)
               }}
             />
           </div>
-        </>
+          <div style={style}>
+            <Stage
+              width={600}
+              height={400}
+              onMouseDown={handleMouseDown}
+              onMousemove={handleMouseMove}
+              onMouseup={handleMouseUp}
+              style={{
+                marginTop: 'mt-3'
+              }}
+            >
+              <Layer>
+                {lines.map((line, i) => (
+                  <Line
+                    key={i}
+                    points={line.points}
+                    stroke={line.color}
+                    strokeWidth={line.size}
+                    tension={0.5}
+                    lineCap="round"
+                    globalCompositeOperation={
+                      line.tool === 'eraser' ? 'destination-out' : 'source-over'
+                    }
+                  />
+                ))}
+              </Layer>
+            </Stage>
+          </div>
+        </div>
       ) : (
-        <img src={imageData} />
+        <img src={imageData} style={style} className="border mx-auto" />
       )}
     </>
   )

@@ -4,7 +4,6 @@ import {
   FormEvent,
   SetStateAction,
   useContext,
-  useEffect,
   useState
 } from 'react'
 import { SocketContext } from '../App'
@@ -38,17 +37,21 @@ const SignIn: FC<PropsType> = ({ setUser }) => {
 
   return (
     <>
-      <form onSubmit={(e) => hundleSubmit(e)}>
-        <p>わああ</p>
+      <form
+        onSubmit={(e) => hundleSubmit(e)}
+        className="flex justify-center flex-col items-center h-screen w-full"
+      >
+        <h1 className="text-lg">ニックネームを入力してください．</h1>
         <input
           type="text"
           name="name"
+          className="border-b text-3xl p-4 text-center mt-12 outline-none"
           onChange={(e) => {
             setInputName(e.target.value)
           }}
         />
+        {!isEnter && <p className="mt-4">満員です．しばらくお待ちください．</p>}
       </form>
-      {!isEnter && <p>満員です．しばらくお待ちください．</p>}
     </>
   )
 }

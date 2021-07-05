@@ -10,7 +10,7 @@ import MessageList from './MessageList'
 import ChatForm from './ChatForm'
 import { MessageType } from '../types'
 import { socketOn } from '../utils/socket'
-import { SocketContext } from '../App'
+import { SocketContext, UserContext } from '../App'
 
 type PropsType = {
   setMessages: Dispatch<SetStateAction<MessageType[]>>
@@ -20,6 +20,7 @@ type PropsType = {
 // 親の更新でレンダリングされたくないのでメモ化
 const Chat: FC<PropsType> = memo(({ setMessages, messages }) => {
   const socket = useContext(SocketContext)
+  const { user } = useContext(UserContext)
 
   // チャットの受信
   useEffect(() => {
@@ -32,10 +33,10 @@ const Chat: FC<PropsType> = memo(({ setMessages, messages }) => {
   }, [socket, setMessages])
 
   return (
-    <>
+    <div className="mx-auto">
       <MessageList messages={messages} />
-      <ChatForm setMessages={setMessages} />
-    </>
+      {user.state === 'answer' && <ChatForm setMessages={setMessages} />}
+    </div>
   )
 })
 
