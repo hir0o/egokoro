@@ -7,11 +7,13 @@ const themes = require('./themes.json')
 const Canvas = require('canvas') // node-canvasの読み込み
 
 // canvas関連
-const canvas = Canvas.createCanvas(400, 400)
+const canvas = Canvas.createCanvas(800, 600)
 const context = canvas.getContext('2d')
+context.fillStyle = '#ffffff'
 const lastPosition = { x: null, y: null }
 let isDrag = false
-let currentColor = '#000000'
+context.lineCap = 'round'
+context.lineJoin = 'round'
 
 const io = require('socket.io')(server, {
   cors: {
@@ -89,8 +91,11 @@ io.on('connection', (socket) => {
   // 描画の開始
   socket.on('start', (payload) => {
     console.log('start: ', payload)
+    const { tool, color, size } = payload
     context.beginPath()
     isDrag = true
+    context.lineWidth = size
+    context.strokeStyle = tool === 'pen' ? color : '#FFFFFF'
     broadCast('start', { data: canvas.toDataURL() })
   })
 
@@ -102,10 +107,6 @@ io.on('connection', (socket) => {
     if (!isDrag) {
       return
     }
-    context.lineCap = 'round'
-    context.lineJoin = 'round'
-    context.lineWidth = 5
-    context.strokeStyle = currentColor
     if (lastPosition.x === null || lastPosition.y === null) {
       context.moveTo(x, y)
     } else {
@@ -120,8 +121,7 @@ io.on('connection', (socket) => {
   })
 
   // マウスが離れたイベント
-  socket.on('end', (payload) => {
-    console.log('end: ', payload)
+  socket.on('end', () => {
     context.closePath()
     isDrag = false
     lastPosition.x = null
