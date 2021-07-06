@@ -1,11 +1,11 @@
-import { FC } from 'react'
+import { VFC } from 'react'
 
 type PropsType = {
   name: string
   text: string
 }
 
-const MessageItem: FC<PropsType> = ({ name, text }) => {
+const MessageItem: VFC<PropsType> = ({ name, text }) => {
   return (
     <li className={`border-b p-2 ${name === 'announce' && 'bg-green-200'} `}>
       {name}: {text}

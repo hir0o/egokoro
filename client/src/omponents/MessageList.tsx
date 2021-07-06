@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react'
+import { VFC, useEffect } from 'react'
 import MessageItem from './MessageItem'
 import { MessageType } from '../types'
 
@@ -6,7 +6,7 @@ type PropsType = {
   messages: MessageType[]
 }
 
-const MessageList: FC<PropsType> = ({ messages }) => {
+const MessageList: VFC<PropsType> = ({ messages }) => {
   const style = {
     maxHeight: '400px',
     minHeight: '400px',

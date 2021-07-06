@@ -1,6 +1,6 @@
 import {
   Dispatch,
-  FC,
+  VFC,
   FormEvent,
   SetStateAction,
   useCallback,
@@ -14,7 +14,7 @@ type PropsType = {
   setMessages: Dispatch<SetStateAction<MessageType[]>>
 }
 
-const ChatForm: FC<PropsType> = ({ setMessages }) => {
+const ChatForm: VFC<PropsType> = ({ setMessages }) => {
   const [text, setText] = useState('')
   const socket = useContext(SocketContext)
   const { user } = useContext(UserContext)

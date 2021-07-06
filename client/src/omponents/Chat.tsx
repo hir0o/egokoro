@@ -1,10 +1,10 @@
 import {
   Dispatch,
-  FC,
   memo,
   SetStateAction,
   useContext,
-  useEffect
+  useEffect,
+  VFC
 } from 'react'
 import MessageList from './MessageList'
 import ChatForm from './ChatForm'
@@ -18,7 +18,7 @@ type PropsType = {
 }
 
 // 親の更新でレンダリングされたくないのでメモ化
-const Chat: FC<PropsType> = memo(({ setMessages, messages }) => {
+const Chat: VFC<PropsType> = memo(({ setMessages, messages }) => {
   const socket = useContext(SocketContext)
   const { user } = useContext(UserContext)
 

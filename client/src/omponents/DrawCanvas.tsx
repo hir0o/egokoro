@@ -1,6 +1,6 @@
 import {
   Dispatch,
-  FC,
+  VFC,
   SetStateAction,
   useContext,
   useEffect,
@@ -20,7 +20,7 @@ type PropsType = {
   setImageData: Dispatch<SetStateAction<string>>
 }
 
-const DrawCanvas: FC<PropsType> = ({
+const DrawCanvas: VFC<PropsType> = ({
   lines,
   setLines,
   imageData,
@@ -32,7 +32,6 @@ const DrawCanvas: FC<PropsType> = ({
 
   const isDrawing = useRef(false)
   const { user } = useContext(UserContext)
-
   const socket = useContext(SocketContext)
 
   const handleMouseDown = (e: Konva.KonvaEventObject<MouseEvent>) => {
@@ -95,7 +94,7 @@ const DrawCanvas: FC<PropsType> = ({
 
       setImageData(payload.data)
     })
-  })
+  }, [])
 
   const style = {
     width: '600px',
@@ -169,7 +168,7 @@ const DrawCanvas: FC<PropsType> = ({
           </div>
         </div>
       ) : (
-        <img src={imageData} style={style} className="border mx-auto" />
+        <img src={imageData} style={style} className="border mx-auto" alt="" />
       )}
     </>
   )
