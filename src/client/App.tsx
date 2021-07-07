@@ -11,7 +11,7 @@ const userInitialState: UserType = {
   state: 'answer'
 }
 
-export const SocketContext = createContext<Socket>({} as Socket) // TODO: 型をいい感じにする
+export const SocketContext = createContext<Socket>({} as Socket)
 export const UserContext = createContext<{
   user: UserType
   updateState: (newState: StateType) => void

@@ -6,7 +6,7 @@ type PropsType = {
   messages: MessageType[]
 }
 
-const MessageList: FC<PropsType> = ({ messages }) => {
+const MessageList: VFC<PropsType> = ({ messages }) => {
   const style = {
     maxHeight: '400px',
     minHeight: '400px',

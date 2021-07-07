@@ -14,12 +14,12 @@ import { addArrayState } from '../utils/useState'
 import Chat from './Chat'
 import DrawCanvas from './DrawCanvas'
 
-type PropType = {
+type PropsType = {
   theme: string
   setTheme: Dispatch<SetStateAction<string>>
 }
 
-const Game: VFC<PropType> = memo(({ theme, setTheme }) => {
+const Game: VFC<PropsType> = memo(({ theme, setTheme }) => {
   const { user, updateState } = useContext(UserContext)
   const socket = useContext(SocketContext)
   const [messages, setMessages] = useState<MessageType[]>([])
@@ -33,8 +33,8 @@ const Game: VFC<PropType> = memo(({ theme, setTheme }) => {
     socketOn<{
       [key: string]: string | number | { [key: string]: string | number }
     }>(socket, 'announce', (payload) => {
-      // ゲームの開始
       switch (payload.type) {
+        // ゲームの開始
         case 'gameStart':
           {
             const isDraw = user.id === payload.drawUserId
@@ -52,7 +52,8 @@ const Game: VFC<PropType> = memo(({ theme, setTheme }) => {
             }
           }
           break
-        case 'gameEnter': // ゲーム中に人が入ってきた
+        // ゲーム中に人が入ってきた
+        case 'gameEnter':
           setTheme(payload.theme as string) // お題を更新
           // 受信が入室した人だったら，役割をお知らせ
           if ((payload.user as UserType)?.id === user.id) {
@@ -91,10 +92,7 @@ const Game: VFC<PropType> = memo(({ theme, setTheme }) => {
           break
       }
     })
-    // TODO: react-hooks/exhaustive-depsだけ無効にする
-    /* eslint-disable */
   }, [])
-  /* eslint-able */
   return (
     <div className="flex flex-wrap">
       <DrawCanvas

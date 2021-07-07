@@ -1,6 +1,6 @@
 import React, {
   Dispatch,
-  FC,
+  VFC,
   FormEvent,
   SetStateAction,
   useContext,
@@ -14,7 +14,7 @@ type PropsType = {
   setUser: Dispatch<SetStateAction<UserType>>
 }
 
-const SignIn: FC<PropsType> = ({ setUser }) => {
+const SignIn: VFC<PropsType> = ({ setUser }) => {
   const [inputName, setInputName] = useState('')
   const [isEnter, setIsEnter] = useState(true)
 

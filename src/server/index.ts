@@ -1,13 +1,13 @@
 import express from 'express'
-const app = express()
 import http from 'http'
-const server = http.createServer(app)
 import themes from './themes.json'
 import Canvas from 'canvas'
-
 // types
 import { UserType, Vector2D } from './types'
 import { Socket } from 'socket.io'
+
+const app = express()
+const server = http.createServer(app)
 
 // canvas関連
 const canvas = Canvas.createCanvas(600, 400)
