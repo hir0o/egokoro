@@ -1,4 +1,4 @@
-import { createContext, useMemo, useState, VFC } from 'react'
+import React, { createContext, useMemo, useState, VFC } from 'react'
 import socketIOClient, { Socket } from 'socket.io-client'
 import Home from './pages/Home'
 import SignIn from './pages/SignIn'
