@@ -1,4 +1,4 @@
-import { FC, memo, useContext, useState } from 'react'
+import React, { FC, memo, useContext, useState } from 'react'
 import { UserContext } from '../App'
 import Game from '../omponents/Game'
 

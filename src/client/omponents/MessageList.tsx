@@ -1,4 +1,4 @@
-import { FC, useEffect } from 'react'
+import React, { FC, useEffect } from 'react'
 import MessageItem from './MessageItem'
 import { MessageType } from '../types'
 
