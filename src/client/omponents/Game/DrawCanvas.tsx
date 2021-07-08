@@ -9,9 +9,9 @@ import React, {
 } from 'react'
 import { Stage, Layer, Line } from 'react-konva'
 import Konva from 'konva'
-import { LineType } from '../types'
-import { socketEmit, socketOn } from '../utils/socket'
-import { SocketContext, UserContext } from '../App'
+import { LineType } from '../../types'
+import { socketEmit, socketOn } from '../../utils/socket'
+import { SocketContext, UserContext } from '../../App'
 
 type PropsType = {
   lines: LineType[]

@@ -6,11 +6,11 @@ import React, {
   useEffect,
   VFC
 } from 'react'
-import MessageList from './MessageList'
+import MessageList from '../MessageList'
 import ChatForm from './ChatForm'
-import { MessageType } from '../types'
-import { socketOn } from '../utils/socket'
-import { SocketContext, UserContext } from '../App'
+import { MessageType } from '../../types'
+import { socketOn } from '../../utils/socket'
+import { SocketContext, UserContext } from '../../App'
 
 type PropsType = {
   setMessages: Dispatch<SetStateAction<MessageType[]>>

@@ -7,11 +7,11 @@ import React, {
   useState,
   VFC
 } from 'react'
-import { SocketContext, UserContext } from '../App'
-import { LineType, MessageType, UserType } from '../types'
-import { socketOn } from '../utils/socket'
-import { addArrayState } from '../utils/useState'
-import Chat from './Chat'
+import { SocketContext, UserContext } from '../../App'
+import { LineType, MessageType, UserType } from '../../types'
+import { socketOn } from '../../utils/socket'
+import { addArrayState } from '../../utils/useState'
+import Chat from '../Chat/Chat'
 import DrawCanvas from './DrawCanvas'
 
 type PropsType = {
