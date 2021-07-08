@@ -6,11 +6,12 @@ import React, {
   useEffect,
   VFC
 } from 'react'
-import MessageList from '../MessageList'
+import MessageList from './MessageList'
 import ChatForm from './ChatForm'
 import { MessageType } from '../../types'
 import { socketOn } from '../../utils/socket'
 import { SocketContext, UserContext } from '../../App'
+import styled from 'styled-components'
 
 type PropsType = {
   setMessages: Dispatch<SetStateAction<MessageType[]>>
@@ -33,11 +34,20 @@ const Chat: VFC<PropsType> = memo(({ setMessages, messages }) => {
   }, [socket, setMessages])
 
   return (
-    <div className="mx-auto">
+    <StyledChat className="mx-auto">
       <MessageList messages={messages} />
       {user.state === 'answer' && <ChatForm setMessages={setMessages} />}
-    </div>
+    </StyledChat>
   )
 })
+
+const StyledChat = styled.div`
+  width: 100%;
+  max-width: 500px;
+  @media (max-width: 1120px) {
+    width: 600px;
+    max-width: none;
+  }
+`
 
 export default Chat

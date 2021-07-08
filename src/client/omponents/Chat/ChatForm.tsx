@@ -7,9 +7,10 @@ import React, {
   useContext,
   useState
 } from 'react'
-import { SocketContext, UserContext } from '../App'
-import { MessageType } from '../types'
-import { socketEmit } from '../utils/socket'
+import { SocketContext, UserContext } from './../../App'
+import { MessageType } from '../../types'
+import { socketEmit } from '../../utils/socket'
+import styled from 'styled-components'
 type PropsType = {
   setMessages: Dispatch<SetStateAction<MessageType[]>>
 }
@@ -34,8 +35,7 @@ const ChatForm: VFC<PropsType> = ({ setMessages }) => {
   )
 
   return (
-    <form
-      className="w-full bg-black p-1"
+    <StyledChatForm
       onSubmit={(e) => {
         hundleSubmit(e)
       }}
@@ -43,13 +43,28 @@ const ChatForm: VFC<PropsType> = ({ setMessages }) => {
       <input
         type="text"
         value={text}
-        className="border w-full"
+        className="chat-form__input"
         onChange={(e) => {
           setText(e.target.value)
         }}
       />
-    </form>
+    </StyledChatForm>
   )
 }
+
+const StyledChatForm = styled.form`
+  width: 100%;
+  background-color: #000000;
+  padding: 0.25rem;
+  margin-top: 0.25rem;
+  .chat-form__input {
+    background-color: #ffffff;
+    border: 1px solid #333333;
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 0.25rem;
+    outline: 0px;
+  }
+`
 
 export default ChatForm

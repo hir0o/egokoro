@@ -11,7 +11,9 @@ const Select: VFC<PropsType> = ({ className, value, items, onChange }) => {
   return (
     <select value={value} className={className} onChange={onChange}>
       {items.map(({ name, value }) => (
-        <option value={value}>{name}</option>
+        <option value={value} key={value}>
+          {name}
+        </option>
       ))}
     </select>
   )

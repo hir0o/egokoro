@@ -1,4 +1,5 @@
-import React, { FC } from 'react'
+import React, { VFC } from 'react'
+import styled from 'styled-components'
 
 type PropsType = {
   name: string
@@ -7,10 +8,20 @@ type PropsType = {
 
 const MessageItem: VFC<PropsType> = ({ name, text }) => {
   return (
-    <li className={`border-b p-2 ${name === 'announce' && 'bg-green-200'} `}>
+    <StyledMessageList isInfo={name === 'announce'}>
       {name}: {text}
-    </li>
+    </StyledMessageList>
   )
 }
+
+const StyledMessageList = styled.li<{ isInfo: boolean }>`
+  border-bottom: 1px solid #333333;
+  padding: 0.5rem;
+  ${({ isInfo }) =>
+    isInfo &&
+    `
+    background: #CDE6EE;
+  `}
+`
 
 export default MessageItem

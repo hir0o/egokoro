@@ -12,6 +12,13 @@ import Konva from 'konva'
 import { LineType } from '../../types'
 import { socketEmit, socketOn } from '../../utils/socket'
 import { SocketContext, UserContext } from '../../App'
+import Select from './Select'
+import styled from 'styled-components'
+
+const canvasSize = {
+  width: 600,
+  height: 400
+}
 
 type PropsType = {
   lines: LineType[]
@@ -96,81 +103,117 @@ const DrawCanvas: VFC<PropsType> = ({
     })
   }, [])
 
-  const style = {
-    width: '600px',
-    height: '400px'
-  }
-
   return (
     <>
       {user.state === 'draw' ? (
-        <div className="border sm:mx-auto">
-          <div className="flex border-b p-3">
-            <select
+        <StyledDrawCanvas>
+          <div className="draw-canvas__inner">
+            <Select
               value={tool}
-              className="border"
+              className="draw-canvas__input"
               onChange={(e) => {
                 setTool(e.target.value as 'pen' | 'eraser')
               }}
-            >
-              <option value="pen">ペン</option>
-              <option value="eraser">消しゴム</option>
-            </select>
-            <select
+              items={[
+                { value: 'pen', name: 'ペン' },
+                { value: 'eraser', name: '消しゴム' }
+              ]}
+            />
+            <Select
               value={size}
-              className="border ml-2"
+              className="draw-canvas__input"
               onChange={(e) => {
                 setSize(Number(e.target.value))
               }}
-            >
-              <option value="3">3</option>
-              <option value="5">5</option>
-              <option value="10">10</option>
-              <option value="15">15</option>
-              <option value="20">20</option>
-            </select>
+              items={[
+                { value: '3', name: '3' },
+                { value: '5', name: '5' },
+                { value: '10', name: '10' },
+                { value: '15', name: '15' },
+                { value: '20', name: '20' }
+              ]}
+            />
             <input
               type="color"
               value={color}
-              className="border ml-2"
+              className="draw-canvas__input"
               onChange={(e) => {
                 setColor(e.target.value)
               }}
             />
           </div>
-          <div style={style}>
+          <div className="draw-canvas__canvas">
             <Stage
-              width={600}
-              height={400}
+              width={canvasSize.width}
+              height={canvasSize.height}
               onMouseDown={handleMouseDown}
               onMousemove={handleMouseMove}
               onMouseup={handleMouseUp}
-              style={{
-                marginTop: 'mt-3'
-              }}
+              className="draw-canvas__stage"
             >
               <Layer>
-                {lines.map((line, i) => (
+                {lines.map(({ points, color, size, tool }, i) => (
                   <Line
                     key={i}
-                    points={line.points}
-                    stroke={line.color}
-                    strokeWidth={line.size}
+                    points={points}
+                    stroke={color}
+                    strokeWidth={size}
                     tension={0.5}
                     lineCap="round"
                     globalCompositeOperation={
-                      line.tool === 'eraser' ? 'destination-out' : 'source-over'
+                      tool === 'eraser' ? 'destination-out' : 'source-over'
                     }
                   />
                 ))}
               </Layer>
             </Stage>
           </div>
-        </div>
+        </StyledDrawCanvas>
       ) : (
-        <img src={imageData} style={style} className="border mx-auto" alt="" />
+        <StyledImageConteiner>
+          <img src={imageData} className="image-container__item" alt="" />
+        </StyledImageConteiner>
       )}
     </>
   )
 }
+
+const StyledDrawCanvas = styled.div`
+  border: 1px solid #333333;
+  @media (max-width: 468px) {
+    margin-left: auto;
+    margin-right: auto;
+  }
+  .draw-canvas__inner {
+    display: flex;
+    border-bottom: 1px solid #333333;
+    padding: 0.75rem;
+  }
+  .draw-canvas__input {
+    border: 1px solid #333333;
+  }
+  .draw-canvas__input + .draw-canvas__input {
+    margin-left: 0.5rem;
+  }
+  .draw-canvas__stage {
+    margin-top: 0.75rem;
+  }
+  .draw-canvas__canvas {
+    width: ${canvasSize.width}px;
+    height: ${canvasSize.height}px;
+    border: 1px solid #333333;
+    margin-left: auto;
+    margin-right: auto;
+  }
+`
+
+const StyledImageConteiner = styled.div`
+  text-align: center;
+  .image-container__item {
+    width: ${canvasSize.width}px;
+    height: ${canvasSize.height}px;
+    border: 1px solid #333333;
+  }
+`
+
 export default DrawCanvas

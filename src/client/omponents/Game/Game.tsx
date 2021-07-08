@@ -7,6 +7,7 @@ import React, {
   useState,
   VFC
 } from 'react'
+import styled from 'styled-components'
 import { SocketContext, UserContext } from '../../App'
 import { LineType, MessageType, UserType } from '../../types'
 import { socketOn } from '../../utils/socket'
@@ -94,7 +95,7 @@ const Game: VFC<PropsType> = memo(({ theme, setTheme }) => {
     })
   }, [])
   return (
-    <div className="flex flex-wrap">
+    <StyledGame>
       <DrawCanvas
         lines={lines}
         setLines={setLines}
@@ -102,8 +103,16 @@ const Game: VFC<PropsType> = memo(({ theme, setTheme }) => {
         setImageData={setImageData}
       />
       <Chat messages={messages} setMessages={setMessages} />
-    </div>
+    </StyledGame>
   )
 })
+
+const StyledGame = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  @media (max-width: 1120px) {
+    justify-content: center;
+  }
+`
 
 export default Game

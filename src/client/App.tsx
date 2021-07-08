@@ -1,7 +1,7 @@
 import React, { createContext, useMemo, useState, VFC } from 'react'
 import socketIOClient, { Socket } from 'socket.io-client'
 import Home from './omponents/Home'
-import SignIn from './omponents/SignIn'
+import SignIn from './omponents/Entry'
 import { UserType, StateType } from './types'
 export const ENDPOINT = 'http://127.0.0.1:5000'
 

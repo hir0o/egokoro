@@ -6,6 +6,7 @@ import React, {
   useContext,
   useState
 } from 'react'
+import styled from 'styled-components'
 import { SocketContext } from '../App'
 import { UserType } from '../types'
 import { socketEmit, socketOn } from '../utils/socket'
@@ -36,24 +37,43 @@ const SignIn: VFC<PropsType> = ({ setUser }) => {
   }
 
   return (
-    <>
-      <form
-        onSubmit={(e) => hundleSubmit(e)}
-        className="flex justify-center flex-col items-center h-screen w-full"
-      >
-        <h1 className="text-lg">ニックネームを入力してください．</h1>
-        <input
-          type="text"
-          name="name"
-          className="border-b text-3xl p-4 text-center mt-12 outline-none"
-          onChange={(e) => {
-            setInputName(e.target.value)
-          }}
-        />
-        {!isEnter && <p className="mt-4">満員です．しばらくお待ちください．</p>}
-      </form>
-    </>
+    <StyledEnter onSubmit={(e) => hundleSubmit(e)}>
+      <h1 className="enter__title">ニックネームを入力してください．</h1>
+      <input
+        type="text"
+        name="name"
+        className="enter__input"
+        onChange={(e) => {
+          setInputName(e.target.value)
+        }}
+      />
+      {!isEnter && (
+        <p className="enter__info">満員です．しばらくお待ちください．</p>
+      )}
+    </StyledEnter>
   )
 }
+const StyledEnter = styled.form`
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  height: 100vh;
+  width: 100%;
+  .enter__title {
+    font-size: 2rem;
+  }
+  .enter__input {
+    border-bottom: 1px solid #e5e5e5;
+    font-size: 2rem;
+    padding: 1rem;
+    text-align: center;
+    margin-top: 3rem;
+    outline: none;
+  }
+  .enter__info {
+    margin-top: 1rem;
+  }
+`
 
 export default SignIn
