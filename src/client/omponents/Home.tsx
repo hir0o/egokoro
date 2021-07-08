@@ -14,7 +14,7 @@ const Home: VFC = memo(() => {
           <p>{user.name}さん</p>
           <p>
             あなたは{user.state === 'draw' ? '描き手' : '回答者'}です。
-            {user.state === 'draw' && `お題は『{${theme}}』です。`}
+            {user.state === 'draw' && `お題は『${theme}』です。`}
           </p>
         </div>
       </header>
