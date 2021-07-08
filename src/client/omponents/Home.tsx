@@ -1,6 +1,6 @@
-import React, { FC, memo, useContext, useState } from 'react'
+import React, { VFC, memo, useContext, useState } from 'react'
 import { UserContext } from '../App'
-import Game from './Game'
+import Game from './Game/Game'
 
 const Home: VFC = memo(() => {
   const [theme, setTheme] = useState('')
