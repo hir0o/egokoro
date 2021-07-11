@@ -131,7 +131,7 @@ io.on('connection', (socket: Socket) => {
 
   // チャット送信のイベント
   socket.on('chat', (payload) => {
-    const { name, id, text } = payload
+    const { name, text } = payload
     broadCast('chat', payload)
 
     // 問題に正解した場合
